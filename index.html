@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Départements FR</title>
+
+<style>
+  :root {
+    --bg:#0d0d0d; --surface:#181818; --card:#1f1f1f; --border:#2e2e2e;
+    --accent:#c8ff00; --accent2:#c8ff00; --success:#c8ff00;
+    --text:#f0f0f0; --muted:#555;
+    --fd:'Helvetica Neue',Helvetica,Arial,sans-serif; --fm:'Helvetica Neue',Helvetica,Arial,sans-serif; --fb:'Helvetica Neue',Helvetica,Arial,sans-serif;
+    --nav:64px; --top:52px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:var(--fb);-webkit-font-smoothing:antialiased;}
+
+  /* TOP */
+  .topbar{position:fixed;top:0;left:0;right:0;height:var(--top);background:rgba(13,13,13,.97);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 16px;z-index:200;}
+  .logo{font-family:var(--fd);font-size:1.1rem;font-weight:800;letter-spacing:.5px;color:var(--accent);}
+
+
+  /* MAIN */
+  .main{position:fixed;top:var(--top);bottom:var(--nav);left:0;right:0;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+  .screen{display:none;padding:14px 12px 28px;}
+  .screen.active{display:block;}
+  .screen-title{font-family:var(--fd);font-size:1.5rem;font-weight:800;letter-spacing:-0.5px;margin-bottom:2px;}
+  .screen-sub{font-size:.7rem;color:var(--muted);font-family:var(--fm);margin-bottom:12px;}
+
+  /* BOTTOM NAV */
+  .bottom-nav{position:fixed;bottom:0;left:0;right:0;height:var(--nav);background:rgba(13,13,13,.97);backdrop-filter:blur(16px);border-top:1px solid var(--border);display:flex;align-items:center;z-index:200;}
+  .nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:6px 0;border:none;background:none;color:var(--muted);font-family:var(--fb);font-size:.58rem;font-weight:500;cursor:pointer;transition:color .2s;}
+  .nav-item .icon{font-size:1.2rem;line-height:1;}
+  .nav-item.active{color:var(--accent);}
+
+  /* ── RANGE BOX ── */
+  .range-box{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:14px;}
+  .range-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+  .range-title{font-size:.65rem;font-family:var(--fm);color:var(--muted);text-transform:uppercase;letter-spacing:1px;}
+  .range-badge{font-family:var(--fd);font-size:1rem;font-weight:800;color:var(--accent);letter-spacing:.5px;}
+
+  /* dual slider track */
+  .slider-wrap{position:relative;height:36px;display:flex;align-items:center;margin-bottom:10px;}
+  .slider-track{position:absolute;left:0;right:0;height:5px;background:var(--border);border-radius:99px;}
+  .slider-fill{position:absolute;height:5px;background:var(--accent);border-radius:99px;pointer-events:none;}
+  .slider-wrap input[type=range]{position:absolute;width:100%;height:5px;background:none;-webkit-appearance:none;appearance:none;pointer-events:none;outline:none;}
+  .slider-wrap input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:26px;height:26px;border-radius:50%;background:var(--accent);border:3px solid #0d0d0d;box-shadow:0 2px 8px rgba(0,0,0,.6);pointer-events:all;cursor:grab;transition:transform .1s;}
+  .slider-wrap input[type=range]::-moz-range-thumb{width:26px;height:26px;border-radius:50%;background:var(--accent);border:3px solid #0d0d0d;box-shadow:0 2px 8px rgba(0,0,0,.6);pointer-events:all;cursor:grab;}
+  .slider-wrap input[type=range]:active::-webkit-slider-thumb{transform:scale(1.15);}
+  #slider-min{z-index:3;} #slider-max{z-index:4;}
+
+  .range-labels{display:flex;justify-content:space-between;font-size:.65rem;font-family:var(--fm);color:var(--muted);}
+  .range-count{font-size:.68rem;font-family:var(--fm);color:var(--muted);text-align:center;margin-top:2px;}
+  .range-count strong{color:var(--success);}
+
+  /* LISTE */
+  .search-box{width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:var(--fb);font-size:1rem;padding:11px 14px;border-radius:12px;outline:none;margin-bottom:12px;transition:border-color .2s;}
+  .search-box:focus{border-color:var(--accent);}
+  .search-box::placeholder{color:var(--muted);}
+  .dept-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
+  .dept-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:11px 12px;transition:transform .1s;}
+  .dept-card:active{transform:scale(.97);}
+  .dept-num{font-family:var(--fd);font-size:1.9rem;font-weight:800;color:var(--accent);line-height:1;margin-bottom:2px;letter-spacing:-1px;}
+  .dept-name{font-size:.8rem;font-weight:600;margin-bottom:4px;line-height:1.2;}
+  .pref-label{display:block;color:var(--accent2);font-size:.6rem;text-transform:uppercase;letter-spacing:.8px;margin-bottom:1px;}
+  .dept-pref{font-size:.7rem;color:var(--muted);font-family:var(--fm);line-height:1.2;}
+
+  /* SHARED */
+  .mode-scroll{display:flex;gap:5px;overflow-x:auto;padding-bottom:4px;margin-bottom:12px;scrollbar-width:none;}
+  .mode-scroll::-webkit-scrollbar{display:none;}
+  .mode-chip{background:var(--surface);border:1px solid var(--border);color:var(--muted);font-size:.7rem;font-family:var(--fm);padding:5px 11px;border-radius:20px;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all .15s;}
+  .mode-chip.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+  .progress-bar{height:4px;background:var(--border);border-radius:99px;overflow:hidden;margin-bottom:12px;}
+  .progress-fill{height:100%;background:var(--accent);border-radius:99px;transition:width .4s ease;}
+  .btn{background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:var(--fb);font-weight:500;font-size:.8rem;padding:9px 14px;border-radius:10px;cursor:pointer;transition:transform .1s;display:inline-flex;align-items:center;gap:5px;}
+  .btn:active{transform:scale(.96);}
+  .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff;}
+  .big-btn{width:100%;background:var(--accent);border:none;color:#fff;font-family:var(--fb);font-weight:600;font-size:1rem;padding:15px;border-radius:14px;cursor:pointer;transition:transform .1s;display:none;}
+  .big-btn:active{transform:scale(.98);}
+
+  /* FLASHCARDS */
+  .fc-top{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+  .fc-progress-wrap{flex:1;}
+  .fc-progress-label{font-size:.68rem;color:var(--muted);font-family:var(--fm);margin-bottom:4px;}
+  .card-scene{perspective:1000px;width:100%;height:210px;margin-bottom:12px;touch-action:none;user-select:none;}
+  .card-inner{width:100%;height:100%;position:relative;transform-style:preserve-3d;transition:transform .5s cubic-bezier(.4,0,.2,1);cursor:pointer;}
+  .card-inner.flipped{transform:rotateY(180deg);}
+  .card-face{position:absolute;inset:0;backface-visibility:hidden;border-radius:18px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px;}
+  .card-front{background:linear-gradient(135deg,#1f1f1f,#161616);border:1px solid var(--accent);box-shadow:0 0 28px rgba(200,255,0,.07);}
+  .card-back{background:linear-gradient(135deg,#222,#181818);border:1px solid var(--accent);box-shadow:0 0 28px rgba(200,255,0,.05);transform:rotateY(180deg);}
+  .card-hint{font-size:.62rem;font-family:var(--fm);color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px;}
+  .card-main{font-family:var(--fd);font-size:4.2rem;font-weight:800;color:var(--accent);line-height:1;margin-bottom:5px;letter-spacing:-2px;}
+  .card-main.text{font-family:var(--fb);font-size:1.4rem;font-weight:700;color:var(--text);}
+  .card-back .card-main{color:var(--success);}
+  .card-sub{font-size:.75rem;color:var(--muted);font-family:var(--fm);}
+  .tap-hint{text-align:center;font-size:.65rem;color:var(--muted);font-family:var(--fm);margin-bottom:10px;}
+  .fc-swipe-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;}
+  .swipe-btn{border:none;border-radius:13px;padding:15px;font-family:var(--fb);font-size:.88rem;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:transform .1s;}
+  .swipe-btn:active{transform:scale(.96);}
+  .swipe-btn.bad{background:rgba(255,255,255,.04);border:1px solid #444;color:#aaa;}
+  .swipe-btn.good{background:rgba(200,255,0,.1);border:1px solid var(--accent);color:var(--accent);}
+  .fc-nav-row{display:flex;gap:7px;justify-content:center;flex-wrap:wrap;margin-bottom:10px;}
+  .fc-stats{display:flex;gap:8px;justify-content:center;font-size:.72rem;font-family:var(--fm);color:var(--muted);flex-wrap:wrap;align-items:center;}
+
+  /* QCM */
+  .score-row{display:flex;gap:7px;margin-bottom:12px;}
+  .score-chip{flex:1;background:var(--card);border:1px solid var(--border);border-radius:11px;padding:9px 6px;text-align:center;}
+  .score-chip .val{font-family:var(--fd);font-size:1.5rem;font-weight:800;display:block;line-height:1;letter-spacing:-1px;}
+  .score-chip .lbl{font-size:.6rem;color:var(--muted);font-family:var(--fm);text-transform:uppercase;letter-spacing:.8px;}
+  .score-chip.good .val{color:var(--success);}
+  .score-chip.bad .val{color:var(--accent2);}
+  .qcm-question{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;text-align:center;margin-bottom:10px;}
+  .qcm-q-label{font-size:.65rem;font-family:var(--fm);color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
+  .qcm-q-num{font-family:var(--fd);font-size:3.8rem;font-weight:800;color:var(--accent);line-height:1;letter-spacing:-2px;}
+  .qcm-q-num.text{font-family:var(--fb);font-size:1.3rem;font-weight:700;color:var(--text);}
+  .qcm-options{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:10px;}
+  .qcm-opt{background:var(--card);border:1px solid var(--border);color:var(--text);font-family:var(--fb);font-size:.8rem;padding:13px 8px;border-radius:11px;cursor:pointer;transition:transform .1s;text-align:center;line-height:1.3;}
+  .qcm-opt:active:not(:disabled){transform:scale(.97);}
+  .qcm-opt.correct{border-color:var(--success);background:rgba(62,207,142,.12);color:var(--success);}
+  .qcm-opt.wrong{border-color:var(--accent2);background:rgba(255,107,74,.1);color:var(--accent2);}
+  .qcm-opt:disabled{cursor:default;}
+  .qcm-feedback{text-align:center;font-size:.8rem;min-height:18px;margin-bottom:10px;font-weight:500;line-height:1.4;padding:0 4px;}
+  .qcm-feedback.correct{color:var(--success);}
+  .qcm-feedback.wrong{color:var(--accent2);}
+
+  /* SAISIE */
+  .type-question{background:var(--card);border:1px solid var(--accent);border-radius:14px;padding:20px 14px;text-align:center;margin-bottom:10px;}
+  .type-q-label{font-size:.65rem;font-family:var(--fm);color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
+  .type-q-num{font-family:var(--fd);font-size:3.8rem;font-weight:800;color:var(--accent);line-height:1;letter-spacing:-2px;}
+  .type-q-num.text{font-family:var(--fb);font-size:1.3rem;font-weight:700;color:var(--text);}
+  .type-row{display:flex;gap:8px;margin-bottom:8px;}
+  .type-input{flex:1;background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:var(--fb);font-size:1rem;padding:13px 14px;border-radius:11px;outline:none;transition:border-color .2s;}
+  .type-input:focus{border-color:var(--accent);}
+  .type-input.correct{border-color:var(--success);background:rgba(62,207,142,.06);}
+  .type-input.wrong{border-color:var(--accent2);background:rgba(255,107,74,.06);}
+  .validate-btn{background:var(--accent);border:none;color:#fff;font-size:1.2rem;width:50px;border-radius:11px;cursor:pointer;flex-shrink:0;transition:transform .1s;}
+  .validate-btn:active{transform:scale(.94);}
+  .saisie-correction{font-size:.78rem;color:var(--muted);font-family:var(--fm);min-height:18px;text-align:center;margin-bottom:8px;}
+
+  .empty-state{text-align:center;padding:36px 20px;color:var(--muted);font-family:var(--fm);font-size:.82rem;line-height:1.6;}
+  .empty-state .emoji{font-size:2.2rem;display:block;margin-bottom:8px;}
+
+  ::-webkit-scrollbar{width:3px;}
+  ::-webkit-scrollbar-track{background:transparent;}
+  ::-webkit-scrollbar-thumb{background:var(--border);border-radius:99px;}
+</style>
+
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo">DEPTS FR</div>
+
+</div>
+
+<div class="main">
+
+  <!-- LISTE -->
+
+  <div id="screen-liste" class="screen active">
+    <div class="screen-title">LISTE</div>
+    <div class="screen-sub">Tous les départements</div>
+    <div class="range-box">
+      <div class="range-header">
+        <div class="range-title">Plage</div>
+        <div class="range-badge" id="badge-liste">01 — 95</div>
+      </div>
+      <div class="slider-wrap">
+        <div class="slider-track"></div>
+        <div class="slider-fill" id="fill-liste"></div>
+        <input type="range" id="smin-liste" min="0" max="95" value="0" oninput="onSlider('liste')">
+        <input type="range" id="smax-liste" min="0" max="95" value="95" oninput="onSlider('liste')">
+      </div>
+      <div class="range-labels"><span>01</span><span>19</span><span>38</span><span>57</span><span>76</span><span>95</span></div>
+      <div class="range-count" id="count-liste"></div>
+    </div>
+    <input class="search-box" id="search-input" type="text" placeholder="🔍  Nom, numéro, préfecture…" oninput="filterList(this.value)" autocomplete="off">
+    <div class="dept-grid" id="dept-grid"></div>
+  </div>
+
+  <!-- FLASHCARDS -->
+
+  <div id="screen-flashcard" class="screen">
+    <div class="screen-title">FLASHCARDS</div>
+    <div class="screen-sub">Glisse ← raté · → su</div>
+    <div class="range-box">
+      <div class="range-header">
+        <div class="range-title">Plage</div>
+        <div class="range-badge" id="badge-fc">01 — 95</div>
+      </div>
+      <div class="slider-wrap">
+        <div class="slider-track"></div>
+        <div class="slider-fill" id="fill-fc"></div>
+        <input type="range" id="smin-fc" min="0" max="95" value="0" oninput="onSlider('fc')">
+        <input type="range" id="smax-fc" min="0" max="95" value="95" oninput="onSlider('fc')">
+      </div>
+      <div class="range-labels"><span>01</span><span>19</span><span>38</span><span>57</span><span>76</span><span>95</span></div>
+      <div class="range-count" id="count-fc"></div>
+    </div>
+
+```
+<div class="fc-top">
+  <div class="fc-progress-wrap">
+    <div class="fc-progress-label" id="fc-progress-label">0 / 0</div>
+    <div class="progress-bar"><div class="progress-fill" id="fc-progress-fill" style="width:0%"></div></div>
+  </div>
+  <button class="btn primary" onclick="shuffleFlashcards()">🔀</button>
+</div>
+
+<div class="mode-scroll" id="fc-mode-scroll">
+  <button class="mode-chip active" onclick="setFcMode('num2name',0)">Num → Nom</button>
+  <button class="mode-chip" onclick="setFcMode('name2num',1)">Nom → Num</button>
+  <button class="mode-chip" onclick="setFcMode('num2pref',2)">Num → Préf</button>
+  <button class="mode-chip" onclick="setFcMode('pref2num',3)">Préf → Num</button>
+</div>
+
+<div id="fc-empty" class="empty-state" style="display:none">
+  <span class="emoji">🎯</span>Aucun département dans cette plage.
+</div>
+<div id="fc-content">
+  <div class="card-scene" id="card-scene">
+    <div class="card-inner" id="card-inner">
+      <div class="card-face card-front">
+        <div class="card-hint" id="fc-hint-front"></div>
+        <div class="card-main" id="fc-front"></div>
+        <div class="card-sub" id="fc-front-sub"></div>
+      </div>
+      <div class="card-face card-back">
+        <div class="card-hint" id="fc-hint-back"></div>
+        <div class="card-main text" id="fc-back"></div>
+        <div class="card-sub" id="fc-back-sub"></div>
+      </div>
+    </div>
+  </div>
+  <div class="tap-hint">👆 Tape pour retourner</div>
+  <div class="fc-swipe-row">
+    <button class="swipe-btn bad" onclick="markCard(false)">✗ À revoir</button>
+    <button class="swipe-btn good" onclick="markCard(true)">✓ Je sais !</button>
+  </div>
+  <div class="fc-nav-row">
+    <button class="btn" onclick="prevCard()">← Préc</button>
+    <button class="btn" onclick="nextCard()">Suiv →</button>
+    <button class="btn" onclick="reviewUnknown()">Revoir ✗</button>
+  </div>
+  <div class="fc-stats">
+    <span>✓ <span id="fc-known" style="color:var(--success)">0</span></span>
+    <span>✗ <span id="fc-unknown" style="color:var(--accent2)">0</span></span>
+    <button class="btn" style="font-size:.65rem;padding:4px 9px" onclick="resetFcStats()">Reset</button>
+  </div>
+</div>
+```
+
+  </div>
+
+  <!-- QCM -->
+
+  <div id="screen-qcm" class="screen">
+    <div class="screen-title">QCM</div>
+    <div class="screen-sub">4 choix — sois rapide !</div>
+    <div class="range-box">
+      <div class="range-header">
+        <div class="range-title">Plage</div>
+        <div class="range-badge" id="badge-qcm">01 — 95</div>
+      </div>
+      <div class="slider-wrap">
+        <div class="slider-track"></div>
+        <div class="slider-fill" id="fill-qcm"></div>
+        <input type="range" id="smin-qcm" min="0" max="95" value="0" oninput="onSlider('qcm')">
+        <input type="range" id="smax-qcm" min="0" max="95" value="95" oninput="onSlider('qcm')">
+      </div>
+      <div class="range-labels"><span>01</span><span>19</span><span>38</span><span>57</span><span>76</span><span>95</span></div>
+      <div class="range-count" id="count-qcm"></div>
+    </div>
+
+```
+<div class="score-row">
+  <div class="score-chip good"><span class="val" id="qcm-correct">0</span><span class="lbl">OK</span></div>
+  <div class="score-chip bad"><span class="val" id="qcm-wrong">0</span><span class="lbl">Raté</span></div>
+  <div class="score-chip"><span class="val" id="qcm-streak">0</span><span class="lbl">Série</span></div>
+</div>
+<div class="mode-scroll" id="qcm-mode-scroll">
+  <button class="mode-chip active" onclick="setQcmMode('num2name',0)">Num → Nom</button>
+  <button class="mode-chip" onclick="setQcmMode('name2num',1)">Nom → Num</button>
+  <button class="mode-chip" onclick="setQcmMode('num2pref',2)">Num → Préf</button>
+  <button class="mode-chip" onclick="setQcmMode('pref2num',3)">Préf → Num</button>
+  <button class="mode-chip" onclick="setQcmMode('mixed',4)">🔀 Mixte</button>
+</div>
+<div id="qcm-empty" class="empty-state" style="display:none">
+  <span class="emoji">🎯</span>Pas assez de départements<br>(4 minimum requis).
+</div>
+<div id="qcm-content">
+  <div class="qcm-question">
+    <div class="qcm-q-label" id="qcm-q-label"></div>
+    <div class="qcm-q-num" id="qcm-q"></div>
+  </div>
+  <div class="qcm-options" id="qcm-options"></div>
+  <div class="qcm-feedback" id="qcm-feedback"></div>
+  <button class="big-btn" id="qcm-next-btn" onclick="nextQcm()">Question suivante →</button>
+</div>
+```
+
+  </div>
+
+  <!-- SAISIE -->
+
+  <div id="screen-saisie" class="screen">
+    <div class="screen-title">SAISIE</div>
+    <div class="screen-sub">Écris la réponse</div>
+    <div class="range-box">
+      <div class="range-header">
+        <div class="range-title">Plage</div>
+        <div class="range-badge" id="badge-saisie">01 — 95</div>
+      </div>
+      <div class="slider-wrap">
+        <div class="slider-track"></div>
+        <div class="slider-fill" id="fill-saisie"></div>
+        <input type="range" id="smin-saisie" min="0" max="95" value="0" oninput="onSlider('saisie')">
+        <input type="range" id="smax-saisie" min="0" max="95" value="95" oninput="onSlider('saisie')">
+      </div>
+      <div class="range-labels"><span>01</span><span>19</span><span>38</span><span>57</span><span>76</span><span>95</span></div>
+      <div class="range-count" id="count-saisie"></div>
+    </div>
+
+```
+<div class="score-row">
+  <div class="score-chip good"><span class="val" id="saisie-correct">0</span><span class="lbl">OK</span></div>
+  <div class="score-chip bad"><span class="val" id="saisie-wrong">0</span><span class="lbl">Raté</span></div>
+</div>
+<div class="mode-scroll">
+  <button class="mode-chip active" onclick="setSaisieMode('num2name',0)">Num → Nom</button>
+  <button class="mode-chip" onclick="setSaisieMode('num2pref',1)">Num → Préf</button>
+</div>
+<div id="saisie-empty" class="empty-state" style="display:none">
+  <span class="emoji">🎯</span>Aucun département dans cette plage.
+</div>
+<div id="saisie-content">
+  <div class="type-question">
+    <div class="type-q-label" id="saisie-q-label"></div>
+    <div class="type-q-num" id="saisie-q"></div>
+  </div>
+  <div class="type-row">
+    <input class="type-input" type="text" id="saisie-input" placeholder="Ta réponse…" autocomplete="off" spellcheck="false" autocorrect="off" autocapitalize="off" onkeydown="saisieKeydown(event)">
+    <button class="validate-btn" onclick="checkSaisie()">✓</button>
+  </div>
+  <div class="qcm-feedback" id="saisie-feedback"></div>
+  <div class="saisie-correction" id="saisie-correction"></div>
+  <button class="big-btn" id="saisie-next-btn" onclick="nextSaisie()">Question suivante →</button>
+</div>
+```
+
+  </div>
+
+</div>
+
+<nav class="bottom-nav">
+  <button class="nav-item active" id="nav-liste" onclick="switchTab('liste','nav-liste')"><span class="icon">📋</span>Liste</button>
+  <button class="nav-item" id="nav-flashcard" onclick="switchTab('flashcard','nav-flashcard')"><span class="icon">🃏</span>Flashcards</button>
+  <button class="nav-item" id="nav-qcm" onclick="switchTab('qcm','nav-qcm')"><span class="icon">🎯</span>QCM</button>
+  <button class="nav-item" id="nav-saisie" onclick="switchTab('saisie','nav-saisie')"><span class="icon">⌨️</span>Saisie</button>
+</nav>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────────────
+const ALL_DEPTS = [
+  {num:"01",name:"Ain",pref:"Bourg-en-Bresse"},
+  {num:"02",name:"Aisne",pref:"Laon"},
+  {num:"03",name:"Allier",pref:"Moulins"},
+  {num:"04",name:"Alpes-de-Haute-Provence",pref:"Digne-les-Bains"},
+  {num:"05",name:"Hautes-Alpes",pref:"Gap"},
+  {num:"06",name:"Alpes-Maritimes",pref:"Nice"},
+  {num:"07",name:"Ardèche",pref:"Privas"},
+  {num:"08",name:"Ardennes",pref:"Charleville-Mézières"},
+  {num:"09",name:"Ariège",pref:"Foix"},
+  {num:"10",name:"Aube",pref:"Troyes"},
+  {num:"11",name:"Aude",pref:"Carcassonne"},
+  {num:"12",name:"Aveyron",pref:"Rodez"},
+  {num:"13",name:"Bouches-du-Rhône",pref:"Marseille"},
+  {num:"14",name:"Calvados",pref:"Caen"},
+  {num:"15",name:"Cantal",pref:"Aurillac"},
+  {num:"16",name:"Charente",pref:"Angoulême"},
+  {num:"17",name:"Charente-Maritime",pref:"La Rochelle"},
+  {num:"18",name:"Cher",pref:"Bourges"},
+  {num:"19",name:"Corrèze",pref:"Tulle"},
+  {num:"21",name:"Côte-d'Or",pref:"Dijon"},
+  {num:"22",name:"Côtes-d'Armor",pref:"Saint-Brieuc"},
+  {num:"23",name:"Creuse",pref:"Guéret"},
+  {num:"24",name:"Dordogne",pref:"Périgueux"},
+  {num:"25",name:"Doubs",pref:"Besançon"},
+  {num:"26",name:"Drôme",pref:"Valence"},
+  {num:"27",name:"Eure",pref:"Évreux"},
+  {num:"28",name:"Eure-et-Loir",pref:"Chartres"},
+  {num:"29",name:"Finistère",pref:"Quimper"},
+  {num:"30",name:"Gard",pref:"Nîmes"},
+  {num:"31",name:"Haute-Garonne",pref:"Toulouse"},
+  {num:"32",name:"Gers",pref:"Auch"},
+  {num:"33",name:"Gironde",pref:"Bordeaux"},
+  {num:"34",name:"Hérault",pref:"Montpellier"},
+  {num:"35",name:"Ille-et-Vilaine",pref:"Rennes"},
+  {num:"36",name:"Indre",pref:"Châteauroux"},
+  {num:"37",name:"Indre-et-Loire",pref:"Tours"},
+  {num:"38",name:"Isère",pref:"Grenoble"},
+  {num:"39",name:"Jura",pref:"Lons-le-Saunier"},
+  {num:"40",name:"Landes",pref:"Mont-de-Marsan"},
+  {num:"41",name:"Loir-et-Cher",pref:"Blois"},
+  {num:"42",name:"Loire",pref:"Saint-Étienne"},
+  {num:"43",name:"Haute-Loire",pref:"Le Puy-en-Velay"},
+  {num:"44",name:"Loire-Atlantique",pref:"Nantes"},
+  {num:"45",name:"Loiret",pref:"Orléans"},
+  {num:"46",name:"Lot",pref:"Cahors"},
+  {num:"47",name:"Lot-et-Garonne",pref:"Agen"},
+  {num:"48",name:"Lozère",pref:"Mende"},
+  {num:"49",name:"Maine-et-Loire",pref:"Angers"},
+  {num:"50",name:"Manche",pref:"Saint-Lô"},
+  {num:"51",name:"Marne",pref:"Châlons-en-Champagne"},
+  {num:"52",name:"Haute-Marne",pref:"Chaumont"},
+  {num:"53",name:"Mayenne",pref:"Laval"},
+  {num:"54",name:"Meurthe-et-Moselle",pref:"Nancy"},
+  {num:"55",name:"Meuse",pref:"Bar-le-Duc"},
+  {num:"56",name:"Morbihan",pref:"Vannes"},
+  {num:"57",name:"Moselle",pref:"Metz"},
+  {num:"58",name:"Nièvre",pref:"Nevers"},
+  {num:"59",name:"Nord",pref:"Lille"},
+  {num:"60",name:"Oise",pref:"Beauvais"},
+  {num:"61",name:"Orne",pref:"Alençon"},
+  {num:"62",name:"Pas-de-Calais",pref:"Arras"},
+  {num:"63",name:"Puy-de-Dôme",pref:"Clermont-Ferrand"},
+  {num:"64",name:"Pyrénées-Atlantiques",pref:"Pau"},
+  {num:"65",name:"Hautes-Pyrénées",pref:"Tarbes"},
+  {num:"66",name:"Pyrénées-Orientales",pref:"Perpignan"},
+  {num:"67",name:"Bas-Rhin",pref:"Strasbourg"},
+  {num:"68",name:"Haut-Rhin",pref:"Colmar"},
+  {num:"69",name:"Rhône",pref:"Lyon"},
+  {num:"70",name:"Haute-Saône",pref:"Vesoul"},
+  {num:"71",name:"Saône-et-Loire",pref:"Mâcon"},
+  {num:"72",name:"Sarthe",pref:"Le Mans"},
+  {num:"73",name:"Savoie",pref:"Chambéry"},
+  {num:"74",name:"Haute-Savoie",pref:"Annecy"},
+  {num:"75",name:"Paris",pref:"Paris"},
+  {num:"76",name:"Seine-Maritime",pref:"Rouen"},
+  {num:"77",name:"Seine-et-Marne",pref:"Melun"},
+  {num:"78",name:"Yvelines",pref:"Versailles"},
+  {num:"79",name:"Deux-Sèvres",pref:"Niort"},
+  {num:"80",name:"Somme",pref:"Amiens"},
+  {num:"81",name:"Tarn",pref:"Albi"},
+  {num:"82",name:"Tarn-et-Garonne",pref:"Montauban"},
+  {num:"83",name:"Var",pref:"Toulon"},
+  {num:"84",name:"Vaucluse",pref:"Avignon"},
+  {num:"85",name:"Vendée",pref:"La Roche-sur-Yon"},
+  {num:"86",name:"Vienne",pref:"Poitiers"},
+  {num:"87",name:"Haute-Vienne",pref:"Limoges"},
+  {num:"88",name:"Vosges",pref:"Épinal"},
+  {num:"89",name:"Yonne",pref:"Auxerre"},
+  {num:"90",name:"Territoire de Belfort",pref:"Belfort"},
+  {num:"91",name:"Essonne",pref:"Évry-Courcouronnes"},
+  {num:"92",name:"Hauts-de-Seine",pref:"Nanterre"},
+  {num:"93",name:"Seine-Saint-Denis",pref:"Bobigny"},
+  {num:"94",name:"Val-de-Marne",pref:"Créteil"},
+  {num:"95",name:"Val-d'Oise",pref:"Cergy"},
+];
+
+// Index 0–95 maps to dept number 01–95 (skipping 20=Corse)
+// We use actual dept numeric values as slider values (1–95)
+// Note: 20 doesn't exist in data, slider will just skip it naturally
+
+function getDepts(from, to) {
+  return ALL_DEPTS.filter(d => { const n = parseInt(d.num); return n >= from && n <= to; });
+}
+
+function pad(n) { return String(n).padStart(2,'0'); }
+
+// ── DUAL RANGE SLIDER ──────────────────────────────────────────────────
+// Each tab has its own pair of sliders + state
+const tabs = ['liste','fc','qcm','saisie'];
+const state = { liste:{from:1,to:95}, fc:{from:1,to:95}, qcm:{from:1,to:95}, saisie:{from:1,to:95} };
+
+function onSlider(tab) {
+  const smin = document.getElementById('smin-'+tab);
+  const smax = document.getElementById('smax-'+tab);
+  let a = parseInt(smin.value), b = parseInt(smax.value);
+
+  // Keep min ≤ max with a gap of at least 1
+  if (a >= b) {
+    // Figure out which thumb moved last — move the other one
+    if (document.activeElement === smin) { a = b - 1; smin.value = a; }
+    else { b = a + 1; smax.value = b; }
+  }
+
+  state[tab].from = Math.max(1, a);
+  state[tab].to   = b;
+
+  updateSliderUI(tab);
+  onRangeChange(tab);
+}
+
+function updateSliderUI(tab) {
+  const { from, to } = state[tab];
+  const pct = v => ((v - 1) / 94) * 100;
+  const fill = document.getElementById('fill-'+tab);
+  fill.style.left  = pct(from) + '%';
+  fill.style.width = (pct(to) - pct(from)) + '%';
+  document.getElementById('badge-'+tab).textContent = pad(from) + ' — ' + pad(to);
+  const pool = getDepts(from, to);
+  document.getElementById('count-'+tab).innerHTML =
+    `<strong>${pool.length}</strong> département${pool.length>1?'s':''} sélectionné${pool.length>1?'s':''}`;
+}
+
+function onRangeChange(tab) {
+  if (tab === 'liste') { filterList(document.getElementById('search-input').value || ''); }
+  if (tab === 'fc')    { initFlashcard(); }
+  if (tab === 'qcm')  { initQcm(); }
+  if (tab === 'saisie'){ initSaisie(); }
+}
+
+
+
+// ── TABS ───────────────────────────────────────────────────────────────
+function switchTab(name, navId) {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
+  document.getElementById('screen-'+name).classList.add('active');
+  document.getElementById(navId).classList.add('active');
+  document.querySelector('.main').scrollTop = 0;
+  if (name==='flashcard') initFlashcard();
+  if (name==='qcm') initQcm();
+  if (name==='saisie') initSaisie();
+}
+
+// ── LISTE ──────────────────────────────────────────────────────────────
+function renderList(data) {
+  const g = document.getElementById('dept-grid');
+  if (!data.length) { g.innerHTML='<div class="empty-state" style="grid-column:span 2"><span class="emoji">🤷</span>Aucun résultat</div>'; return; }
+  g.innerHTML = data.map(d=>`
+    <div class="dept-card">
+      <div class="dept-num">${d.num}</div>
+      <div class="dept-name">${d.name}</div>
+      <span class="pref-label">préfecture</span>
+      <div class="dept-pref">${d.pref}</div>
+    </div>`).join('');
+}
+
+function filterList(q) {
+  const {from,to} = state.liste;
+  const base = getDepts(from, to);
+  const s = q.toLowerCase().trim();
+  renderList(s ? base.filter(d=>d.num.includes(s)||d.name.toLowerCase().includes(s)||d.pref.toLowerCase().includes(s)) : base);
+}
+
+// ── FLASHCARDS ─────────────────────────────────────────────────────────
+let fcMode='num2name', fcDeck=[], fcIdx=0;
+let fcKnown=0, fcUnknown=0, fcFlipped=false, fcMarked=new Set();
+let touchStartX=0, touchStartY=0, touchMoved=false;
+
+const cardScene = document.getElementById('card-scene');
+cardScene.addEventListener('touchstart',e=>{touchStartX=e.touches[0].clientX;touchStartY=e.touches[0].clientY;touchMoved=false;},{passive:true});
+cardScene.addEventListener('touchmove',e=>{if(Math.abs(e.touches[0].clientX-touchStartX)>8||Math.abs(e.touches[0].clientY-touchStartY)>8)touchMoved=true;},{passive:true});
+cardScene.addEventListener('touchend',e=>{
+  const dx=e.changedTouches[0].clientX-touchStartX;
+  const dy=e.changedTouches[0].clientY-touchStartY;
+  if(Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>40){dx>0?markCard(true):markCard(false);}
+  else if(!touchMoved){flipCard();}
+},{passive:true});
+
+function setFcMode(m,idx){
+  fcMode=m;
+  document.querySelectorAll('#fc-mode-scroll .mode-chip').forEach((b,i)=>b.classList.toggle('active',i===idx));
+  fcFlipped=false; document.getElementById('card-inner').classList.remove('flipped');
+  renderCard();
+}
+
+function initFlashcard(){
+  const pool = getDepts(state.fc.from, state.fc.to);
+  const empty = pool.length===0;
+  document.getElementById('fc-empty').style.display = empty?'block':'none';
+  document.getElementById('fc-content').style.display = empty?'none':'block';
+  if(empty) return;
+  fcDeck = [...pool].sort(()=>Math.random()-.5);
+  fcIdx=0; fcFlipped=false;
+  document.getElementById('card-inner').classList.remove('flipped');
+  renderCard(); updateFcProgress();
+}
+
+function renderCard(){
+  if(!fcDeck.length) return;
+  const d=fcDeck[fcIdx];
+  const fEl=document.getElementById('fc-front'), bEl=document.getElementById('fc-back');
+  const hf=document.getElementById('fc-hint-front'), hb=document.getElementById('fc-hint-back');
+  const fs=document.getElementById('fc-front-sub'), bs=document.getElementById('fc-back-sub');
+  fEl.className='card-main'; bEl.className='card-main text'; bEl.style.fontSize='';
+  if(fcMode==='num2name'){hf.textContent='Quel département ?';fEl.textContent=d.num;hb.textContent='Département';bEl.textContent=d.name;bs.textContent='📍 '+d.pref;fs.textContent='';}
+  else if(fcMode==='name2num'){hf.textContent='Quel numéro ?';fEl.className='card-main text';fEl.textContent=d.name;hb.textContent='Numéro';bEl.className='card-main';bEl.textContent=d.num;bs.textContent='📍 '+d.pref;fs.textContent='';}
+  else if(fcMode==='num2pref'){hf.textContent='Quelle préfecture ?';fEl.textContent=d.num;fs.textContent=d.name;hb.textContent='Préfecture';bEl.textContent=d.pref;bs.textContent='';}
+  else{hf.textContent='Quel numéro ?';fEl.className='card-main text';fEl.textContent=d.pref;fs.textContent='';hb.textContent='Numéro + Dép.';bEl.className='card-main';bEl.textContent=d.num;bs.textContent=d.name;}
+}
+
+function flipCard(){fcFlipped=!fcFlipped;document.getElementById('card-inner').classList.toggle('flipped',fcFlipped);}
+function nextCard(){fcIdx=(fcIdx+1)%fcDeck.length;fcFlipped=false;document.getElementById('card-inner').classList.remove('flipped');renderCard();updateFcProgress();}
+function prevCard(){fcIdx=(fcIdx-1+fcDeck.length)%fcDeck.length;fcFlipped=false;document.getElementById('card-inner').classList.remove('flipped');renderCard();updateFcProgress();}
+function markCard(known){
+  const d=fcDeck[fcIdx];
+  if(known){fcKnown++;fcMarked.add(d.num+'_known');fcMarked.delete(d.num+'_unknown');}
+  else{fcUnknown++;fcMarked.add(d.num+'_unknown');fcMarked.delete(d.num+'_known');}
+  document.getElementById('fc-known').textContent=fcKnown;
+  document.getElementById('fc-unknown').textContent=fcUnknown;
+  nextCard();
+}
+function updateFcProgress(){
+  const pct=Math.round(((fcIdx+1)/fcDeck.length)*100);
+  document.getElementById('fc-progress-label').textContent=`${fcIdx+1} / ${fcDeck.length}`;
+  document.getElementById('fc-progress-fill').style.width=pct+'%';
+}
+function shuffleFlashcards(){fcDeck=[...getDepts(state.fc.from,state.fc.to)].sort(()=>Math.random()-.5);fcIdx=0;fcFlipped=false;document.getElementById('card-inner').classList.remove('flipped');renderCard();updateFcProgress();}
+function resetFcStats(){fcKnown=0;fcUnknown=0;document.getElementById('fc-known').textContent=0;document.getElementById('fc-unknown').textContent=0;}
+function reviewUnknown(){
+  const u=getDepts(state.fc.from,state.fc.to).filter(d=>fcMarked.has(d.num+'_unknown'));
+  if(!u.length){alert('Pas de cartes à revoir !');return;}
+  fcDeck=u.sort(()=>Math.random()-.5);fcIdx=0;fcFlipped=false;
+  document.getElementById('card-inner').classList.remove('flipped');
+  renderCard();updateFcProgress();
+}
+
+// ── QCM ────────────────────────────────────────────────────────────────
+let qcmMode='num2name', qcmCurrent=null;
+let qcmCorrectCount=0, qcmWrongCount=0, qcmStreak=0, qcmAnswered=false;
+
+function setQcmMode(m,idx){
+  qcmMode=m;
+  document.querySelectorAll('#qcm-mode-scroll .mode-chip').forEach((b,i)=>b.classList.toggle('active',i===idx));
+  nextQcm();
+}
+
+function initQcm(){
+  const pool=getDepts(state.qcm.from,state.qcm.to);
+  const empty=pool.length<4;
+  document.getElementById('qcm-empty').style.display=empty?'block':'none';
+  document.getElementById('qcm-content').style.display=empty?'none':'block';
+  if(!empty) nextQcm();
+}
+
+function nextQcm(){
+  document.getElementById('qcm-feedback').textContent='';
+  document.getElementById('qcm-feedback').className='qcm-feedback';
+  document.getElementById('qcm-next-btn').style.display='none';
+  qcmAnswered=false;
+  const pool=getDepts(state.qcm.from,state.qcm.to);
+  if(pool.length<4) return;
+  const modes=['num2name','name2num','num2pref','pref2num'];
+  const mode=qcmMode==='mixed'?modes[Math.floor(Math.random()*4)]:qcmMode;
+  const dept=pool[Math.floor(Math.random()*pool.length)];
+  qcmCurrent={dept,mode};
+  const qEl=document.getElementById('qcm-q'), lEl=document.getElementById('qcm-q-label');
+  if(mode==='num2name'){lEl.textContent='Quel est ce département ?';qEl.className='qcm-q-num';qEl.textContent=dept.num;}
+  else if(mode==='name2num'){lEl.textContent='Quel est le numéro ?';qEl.className='qcm-q-num text';qEl.textContent=dept.name;}
+  else if(mode==='num2pref'){lEl.textContent='Quelle est la préfecture ?';qEl.className='qcm-q-num';qEl.textContent=dept.num;}
+  else{lEl.textContent='À quel numéro correspond cette préfecture ?';qEl.className='qcm-q-num text';qEl.textContent=dept.pref;}
+  // Distractors from the full list so there are always 3
+  const wrong=ALL_DEPTS.filter(d=>d.num!==dept.num).sort(()=>Math.random()-.5).slice(0,3);
+  const opts=[dept,...wrong].sort(()=>Math.random()-.5);
+  document.getElementById('qcm-options').innerHTML=opts.map(d=>{
+    let label;
+    if(mode==='num2name') label=d.name;
+    else if(mode==='pref2num'||mode==='name2num') label=`<strong>${d.num}</strong>`;
+    else label=d.pref;
+    return `<button class="qcm-opt" data-num="${d.num}" onclick="answerQcm('${d.num}',this)">${label}</button>`;
+  }).join('');
+}
+
+function answerQcm(chosenNum,btn){
+  if(qcmAnswered) return;
+  qcmAnswered=true;
+  const correct=qcmCurrent.dept.num===chosenNum;
+  document.querySelectorAll('.qcm-opt').forEach(b=>{b.disabled=true;if(b.dataset.num===qcmCurrent.dept.num)b.classList.add('correct');});
+  const fb=document.getElementById('qcm-feedback');
+  if(correct){btn.classList.add('correct');qcmCorrectCount++;qcmStreak++;fb.textContent=`✓ ${qcmCurrent.dept.name} (${qcmCurrent.dept.num}) — ${qcmCurrent.dept.pref}`;fb.className='qcm-feedback correct';}
+  else{btn.classList.add('wrong');qcmWrongCount++;qcmStreak=0;fb.textContent=`✗ C'était ${qcmCurrent.dept.name} (${qcmCurrent.dept.num}) — ${qcmCurrent.dept.pref}`;fb.className='qcm-feedback wrong';}
+  document.getElementById('qcm-correct').textContent=qcmCorrectCount;
+  document.getElementById('qcm-wrong').textContent=qcmWrongCount;
+  document.getElementById('qcm-streak').textContent=qcmStreak;
+  document.getElementById('qcm-next-btn').style.display='block';
+}
+
+// ── SAISIE ─────────────────────────────────────────────────────────────
+let saisieMode='num2name', saisieCurrent=null;
+let saisieCorrectCount=0, saisieWrongCount=0, saisieAnswered=false;
+
+function setSaisieMode(m,idx){
+  saisieMode=m;
+  document.querySelectorAll('#screen-saisie .mode-chip').forEach((b,i)=>b.classList.toggle('active',i===idx));
+  nextSaisie();
+}
+
+function initSaisie(){
+  const pool=getDepts(state.saisie.from,state.saisie.to);
+  const empty=pool.length===0;
+  document.getElementById('saisie-empty').style.display=empty?'block':'none';
+  document.getElementById('saisie-content').style.display=empty?'none':'block';
+  if(!empty) nextSaisie();
+}
+
+function nextSaisie(){
+  saisieAnswered=false;
+  const pool=getDepts(state.saisie.from,state.saisie.to);
+  if(!pool.length) return;
+  saisieCurrent=pool[Math.floor(Math.random()*pool.length)];
+  const qEl=document.getElementById('saisie-q'), lEl=document.getElementById('saisie-q-label');
+  if(saisieMode==='num2name'){lEl.textContent='Quel est ce département ?';qEl.className='type-q-num';qEl.textContent=saisieCurrent.num;}
+  else{lEl.textContent='Quelle est la préfecture ?';qEl.className='type-q-num text';qEl.textContent=saisieCurrent.num+' — '+saisieCurrent.name;}
+  const inp=document.getElementById('saisie-input');
+  inp.value='';inp.className='type-input';inp.disabled=false;
+  document.getElementById('saisie-feedback').textContent='';
+  document.getElementById('saisie-feedback').className='qcm-feedback';
+  document.getElementById('saisie-correction').textContent='';
+  document.getElementById('saisie-next-btn').style.display='none';
+}
+
+function normalize(s){return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[-\s']/g,'').trim();}
+
+function checkSaisie(){
+  if(saisieAnswered) return;
+  const inp=document.getElementById('saisie-input');
+  const val=inp.value.trim(); if(!val) return;
+  const correct=saisieMode==='num2name'?saisieCurrent.name:saisieCurrent.pref;
+  const ok=normalize(val)===normalize(correct);
+  saisieAnswered=true; inp.disabled=true; inp.className='type-input '+(ok?'correct':'wrong');
+  const fb=document.getElementById('saisie-feedback');
+  if(ok){saisieCorrectCount++;fb.textContent='✓ Correct !';fb.className='qcm-feedback correct';document.getElementById('saisie-correction').textContent='';}
+  else{saisieWrongCount++;fb.textContent='✗ Incorrect';fb.className='qcm-feedback wrong';document.getElementById('saisie-correction').textContent='→ Réponse : '+correct;}
+  document.getElementById('saisie-correct').textContent=saisieCorrectCount;
+  document.getElementById('saisie-wrong').textContent=saisieWrongCount;
+  document.getElementById('saisie-next-btn').style.display='block';
+}
+
+function saisieKeydown(e){if(e.key==='Enter'){if(saisieAnswered)nextSaisie();else checkSaisie();}}
+
+// ── INIT ───────────────────────────────────────────────────────────────
+tabs.forEach(tab => updateSliderUI(tab));
+renderList(ALL_DEPTS);
+initFlashcard();
+initQcm();
+</script>
+
+</body>
+</html>
