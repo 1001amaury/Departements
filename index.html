@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -152,12 +151,9 @@
 
 <div class="topbar">
   <div class="logo">DEPTS FR</div>
-
 </div>
 
 <div class="main">
-
-  <!-- LISTE -->
 
   <div id="screen-liste" class="screen active">
     <div class="screen-title">LISTE</div>
@@ -180,8 +176,6 @@
     <div class="dept-grid" id="dept-grid"></div>
   </div>
 
-  <!-- FLASHCARDS -->
-
   <div id="screen-flashcard" class="screen">
     <div class="screen-title">FLASHCARDS</div>
     <div class="screen-sub">Glisse ← raté · → su</div>
@@ -199,62 +193,54 @@
       <div class="range-labels"><span>01</span><span>19</span><span>38</span><span>57</span><span>76</span><span>95</span></div>
       <div class="range-count" id="count-fc"></div>
     </div>
-
-```
-<div class="fc-top">
-  <div class="fc-progress-wrap">
-    <div class="fc-progress-label" id="fc-progress-label">0 / 0</div>
-    <div class="progress-bar"><div class="progress-fill" id="fc-progress-fill" style="width:0%"></div></div>
-  </div>
-  <button class="btn primary" onclick="shuffleFlashcards()">🔀</button>
-</div>
-
-<div class="mode-scroll" id="fc-mode-scroll">
-  <button class="mode-chip active" onclick="setFcMode('num2name',0)">Num → Nom</button>
-  <button class="mode-chip" onclick="setFcMode('name2num',1)">Nom → Num</button>
-  <button class="mode-chip" onclick="setFcMode('num2pref',2)">Num → Préf</button>
-  <button class="mode-chip" onclick="setFcMode('pref2num',3)">Préf → Num</button>
-</div>
-
-<div id="fc-empty" class="empty-state" style="display:none">
-  <span class="emoji">🎯</span>Aucun département dans cette plage.
-</div>
-<div id="fc-content">
-  <div class="card-scene" id="card-scene">
-    <div class="card-inner" id="card-inner">
-      <div class="card-face card-front">
-        <div class="card-hint" id="fc-hint-front"></div>
-        <div class="card-main" id="fc-front"></div>
-        <div class="card-sub" id="fc-front-sub"></div>
+    <div class="fc-top">
+      <div class="fc-progress-wrap">
+        <div class="fc-progress-label" id="fc-progress-label">0 / 0</div>
+        <div class="progress-bar"><div class="progress-fill" id="fc-progress-fill" style="width:0%"></div></div>
       </div>
-      <div class="card-face card-back">
-        <div class="card-hint" id="fc-hint-back"></div>
-        <div class="card-main text" id="fc-back"></div>
-        <div class="card-sub" id="fc-back-sub"></div>
+      <button class="btn primary" onclick="shuffleFlashcards()">🔀</button>
+    </div>
+    <div class="mode-scroll" id="fc-mode-scroll">
+      <button class="mode-chip active" onclick="setFcMode('num2name',0)">Num → Nom</button>
+      <button class="mode-chip" onclick="setFcMode('name2num',1)">Nom → Num</button>
+      <button class="mode-chip" onclick="setFcMode('num2pref',2)">Num → Préf</button>
+      <button class="mode-chip" onclick="setFcMode('pref2num',3)">Préf → Num</button>
+    </div>
+    <div id="fc-empty" class="empty-state" style="display:none">
+      <span class="emoji">🎯</span>Aucun département dans cette plage.
+    </div>
+    <div id="fc-content">
+      <div class="card-scene" id="card-scene">
+        <div class="card-inner" id="card-inner">
+          <div class="card-face card-front">
+            <div class="card-hint" id="fc-hint-front"></div>
+            <div class="card-main" id="fc-front"></div>
+            <div class="card-sub" id="fc-front-sub"></div>
+          </div>
+          <div class="card-face card-back">
+            <div class="card-hint" id="fc-hint-back"></div>
+            <div class="card-main text" id="fc-back"></div>
+            <div class="card-sub" id="fc-back-sub"></div>
+          </div>
+        </div>
+      </div>
+      <div class="tap-hint">👆 Tape pour retourner</div>
+      <div class="fc-swipe-row">
+        <button class="swipe-btn bad" onclick="markCard(false)">✗ À revoir</button>
+        <button class="swipe-btn good" onclick="markCard(true)">✓ Je sais !</button>
+      </div>
+      <div class="fc-nav-row">
+        <button class="btn" onclick="prevCard()">← Préc</button>
+        <button class="btn" onclick="nextCard()">Suiv →</button>
+        <button class="btn" onclick="reviewUnknown()">Revoir ✗</button>
+      </div>
+      <div class="fc-stats">
+        <span>✓ <span id="fc-known" style="color:var(--success)">0</span></span>
+        <span>✗ <span id="fc-unknown" style="color:var(--accent2)">0</span></span>
+        <button class="btn" style="font-size:.65rem;padding:4px 9px" onclick="resetFcStats()">Reset</button>
       </div>
     </div>
   </div>
-  <div class="tap-hint">👆 Tape pour retourner</div>
-  <div class="fc-swipe-row">
-    <button class="swipe-btn bad" onclick="markCard(false)">✗ À revoir</button>
-    <button class="swipe-btn good" onclick="markCard(true)">✓ Je sais !</button>
-  </div>
-  <div class="fc-nav-row">
-    <button class="btn" onclick="prevCard()">← Préc</button>
-    <button class="btn" onclick="nextCard()">Suiv →</button>
-    <button class="btn" onclick="reviewUnknown()">Revoir ✗</button>
-  </div>
-  <div class="fc-stats">
-    <span>✓ <span id="fc-known" style="color:var(--success)">0</span></span>
-    <span>✗ <span id="fc-unknown" style="color:var(--accent2)">0</span></span>
-    <button class="btn" style="font-size:.65rem;padding:4px 9px" onclick="resetFcStats()">Reset</button>
-  </div>
-</div>
-```
-
-  </div>
-
-  <!-- QCM -->
 
   <div id="screen-qcm" class="screen">
     <div class="screen-title">QCM</div>
@@ -273,37 +259,32 @@
       <div class="range-labels"><span>01</span><span>19</span><span>38</span><span>57</span><span>76</span><span>95</span></div>
       <div class="range-count" id="count-qcm"></div>
     </div>
-
-```
-<div class="score-row">
-  <div class="score-chip good"><span class="val" id="qcm-correct">0</span><span class="lbl">OK</span></div>
-  <div class="score-chip bad"><span class="val" id="qcm-wrong">0</span><span class="lbl">Raté</span></div>
-  <div class="score-chip"><span class="val" id="qcm-streak">0</span><span class="lbl">Série</span></div>
-</div>
-<div class="mode-scroll" id="qcm-mode-scroll">
-  <button class="mode-chip active" onclick="setQcmMode('num2name',0)">Num → Nom</button>
-  <button class="mode-chip" onclick="setQcmMode('name2num',1)">Nom → Num</button>
-  <button class="mode-chip" onclick="setQcmMode('num2pref',2)">Num → Préf</button>
-  <button class="mode-chip" onclick="setQcmMode('pref2num',3)">Préf → Num</button>
-  <button class="mode-chip" onclick="setQcmMode('mixed',4)">🔀 Mixte</button>
-</div>
-<div id="qcm-empty" class="empty-state" style="display:none">
-  <span class="emoji">🎯</span>Pas assez de départements<br>(4 minimum requis).
-</div>
-<div id="qcm-content">
-  <div class="qcm-question">
-    <div class="qcm-q-label" id="qcm-q-label"></div>
-    <div class="qcm-q-num" id="qcm-q"></div>
+    <div class="score-row">
+      <div class="score-chip good"><span class="val" id="qcm-correct">0</span><span class="lbl">OK</span></div>
+      <div class="score-chip bad"><span class="val" id="qcm-wrong">0</span><span class="lbl">Raté</span></div>
+      <div class="score-chip"><span class="val" id="qcm-streak">0</span><span class="lbl">Série</span></div>
+    </div>
+    <div class="mode-scroll" id="qcm-mode-scroll">
+      <button class="mode-chip active" onclick="setQcmMode('num2name',0)">Num → Nom</button>
+      <button class="mode-chip" onclick="setQcmMode('name2num',1)">Nom → Num</button>
+      <button class="mode-chip" onclick="setQcmMode('num2pref',2)">Num → Préf</button>
+      <button class="mode-chip" onclick="setQcmMode('pref2num',3)">Préf → Num</button>
+      <button class="mode-chip" onclick="setQcmMode('name2pref',4)">Nom → Préf</button>
+      <button class="mode-chip" onclick="setQcmMode('mixed',5)">🔀 Mixte</button>
+    </div>
+    <div id="qcm-empty" class="empty-state" style="display:none">
+      <span class="emoji">🎯</span>Pas assez de départements<br>(4 minimum requis).
+    </div>
+    <div id="qcm-content">
+      <div class="qcm-question">
+        <div class="qcm-q-label" id="qcm-q-label"></div>
+        <div class="qcm-q-num" id="qcm-q"></div>
+      </div>
+      <div class="qcm-options" id="qcm-options"></div>
+      <div class="qcm-feedback" id="qcm-feedback"></div>
+      <button class="big-btn" id="qcm-next-btn" onclick="nextQcm()">Question suivante →</button>
+    </div>
   </div>
-  <div class="qcm-options" id="qcm-options"></div>
-  <div class="qcm-feedback" id="qcm-feedback"></div>
-  <button class="big-btn" id="qcm-next-btn" onclick="nextQcm()">Question suivante →</button>
-</div>
-```
-
-  </div>
-
-  <!-- SAISIE -->
 
   <div id="screen-saisie" class="screen">
     <div class="screen-title">SAISIE</div>
@@ -322,34 +303,30 @@
       <div class="range-labels"><span>01</span><span>19</span><span>38</span><span>57</span><span>76</span><span>95</span></div>
       <div class="range-count" id="count-saisie"></div>
     </div>
-
-```
-<div class="score-row">
-  <div class="score-chip good"><span class="val" id="saisie-correct">0</span><span class="lbl">OK</span></div>
-  <div class="score-chip bad"><span class="val" id="saisie-wrong">0</span><span class="lbl">Raté</span></div>
-</div>
-<div class="mode-scroll">
-  <button class="mode-chip active" onclick="setSaisieMode('num2name',0)">Num → Nom</button>
-  <button class="mode-chip" onclick="setSaisieMode('num2pref',1)">Num → Préf</button>
-</div>
-<div id="saisie-empty" class="empty-state" style="display:none">
-  <span class="emoji">🎯</span>Aucun département dans cette plage.
-</div>
-<div id="saisie-content">
-  <div class="type-question">
-    <div class="type-q-label" id="saisie-q-label"></div>
-    <div class="type-q-num" id="saisie-q"></div>
-  </div>
-  <div class="type-row">
-    <input class="type-input" type="text" id="saisie-input" placeholder="Ta réponse…" autocomplete="off" spellcheck="false" autocorrect="off" autocapitalize="off" onkeydown="saisieKeydown(event)">
-    <button class="validate-btn" onclick="checkSaisie()">✓</button>
-  </div>
-  <div class="qcm-feedback" id="saisie-feedback"></div>
-  <div class="saisie-correction" id="saisie-correction"></div>
-  <button class="big-btn" id="saisie-next-btn" onclick="nextSaisie()">Question suivante →</button>
-</div>
-```
-
+    <div class="score-row">
+      <div class="score-chip good"><span class="val" id="saisie-correct">0</span><span class="lbl">OK</span></div>
+      <div class="score-chip bad"><span class="val" id="saisie-wrong">0</span><span class="lbl">Raté</span></div>
+    </div>
+    <div class="mode-scroll">
+      <button class="mode-chip active" onclick="setSaisieMode('num2name',0)">Num → Nom</button>
+      <button class="mode-chip" onclick="setSaisieMode('num2pref',1)">Num → Préf</button>
+    </div>
+    <div id="saisie-empty" class="empty-state" style="display:none">
+      <span class="emoji">🎯</span>Aucun département dans cette plage.
+    </div>
+    <div id="saisie-content">
+      <div class="type-question">
+        <div class="type-q-label" id="saisie-q-label"></div>
+        <div class="type-q-num" id="saisie-q"></div>
+      </div>
+      <div class="type-row">
+        <input class="type-input" type="text" id="saisie-input" placeholder="Ta réponse…" autocomplete="off" spellcheck="false" autocorrect="off" autocapitalize="off" onkeydown="saisieKeydown(event)">
+        <button class="validate-btn" onclick="checkSaisie()">✓</button>
+      </div>
+      <div class="qcm-feedback" id="saisie-feedback"></div>
+      <div class="saisie-correction" id="saisie-correction"></div>
+      <button class="big-btn" id="saisie-next-btn" onclick="nextSaisie()">Question suivante →</button>
+    </div>
   </div>
 
 </div>
@@ -460,10 +437,6 @@ const ALL_DEPTS = [
   {num:"95",name:"Val-d'Oise",pref:"Cergy"},
 ];
 
-// Index 0–95 maps to dept number 01–95 (skipping 20=Corse)
-// We use actual dept numeric values as slider values (1–95)
-// Note: 20 doesn't exist in data, slider will just skip it naturally
-
 function getDepts(from, to) {
   return ALL_DEPTS.filter(d => { const n = parseInt(d.num); return n >= from && n <= to; });
 }
@@ -471,7 +444,6 @@ function getDepts(from, to) {
 function pad(n) { return String(n).padStart(2,'0'); }
 
 // ── DUAL RANGE SLIDER ──────────────────────────────────────────────────
-// Each tab has its own pair of sliders + state
 const tabs = ['liste','fc','qcm','saisie'];
 const state = { liste:{from:1,to:95}, fc:{from:1,to:95}, qcm:{from:1,to:95}, saisie:{from:1,to:95} };
 
@@ -479,17 +451,12 @@ function onSlider(tab) {
   const smin = document.getElementById('smin-'+tab);
   const smax = document.getElementById('smax-'+tab);
   let a = parseInt(smin.value), b = parseInt(smax.value);
-
-  // Keep min ≤ max with a gap of at least 1
   if (a >= b) {
-    // Figure out which thumb moved last — move the other one
     if (document.activeElement === smin) { a = b - 1; smin.value = a; }
     else { b = a + 1; smax.value = b; }
   }
-
   state[tab].from = Math.max(1, a);
   state[tab].to   = b;
-
   updateSliderUI(tab);
   onRangeChange(tab);
 }
@@ -512,8 +479,6 @@ function onRangeChange(tab) {
   if (tab === 'qcm')  { initQcm(); }
   if (tab === 'saisie'){ initSaisie(); }
 }
-
-
 
 // ── TABS ───────────────────────────────────────────────────────────────
 function switchTab(name, navId) {
@@ -645,22 +610,25 @@ function nextQcm(){
   qcmAnswered=false;
   const pool=getDepts(state.qcm.from,state.qcm.to);
   if(pool.length<4) return;
-  const modes=['num2name','name2num','num2pref','pref2num'];
-  const mode=qcmMode==='mixed'?modes[Math.floor(Math.random()*4)]:qcmMode;
+  const modes=['num2name','name2num','num2pref','pref2num','name2pref'];
+  const mode=qcmMode==='mixed'?modes[Math.floor(Math.random()*modes.length)]:qcmMode;
   const dept=pool[Math.floor(Math.random()*pool.length)];
   qcmCurrent={dept,mode};
   const qEl=document.getElementById('qcm-q'), lEl=document.getElementById('qcm-q-label');
+  
   if(mode==='num2name'){lEl.textContent='Quel est ce département ?';qEl.className='qcm-q-num';qEl.textContent=dept.num;}
   else if(mode==='name2num'){lEl.textContent='Quel est le numéro ?';qEl.className='qcm-q-num text';qEl.textContent=dept.name;}
   else if(mode==='num2pref'){lEl.textContent='Quelle est la préfecture ?';qEl.className='qcm-q-num';qEl.textContent=dept.num;}
-  else{lEl.textContent='À quel numéro correspond cette préfecture ?';qEl.className='qcm-q-num text';qEl.textContent=dept.pref;}
-  // Distractors from the full list so there are always 3
+  else if(mode==='pref2num'){lEl.textContent='À quel numéro correspond cette préfecture ?';qEl.className='qcm-q-num text';qEl.textContent=dept.pref;}
+  else if(mode==='name2pref'){lEl.textContent='Quelle est la préfecture de ce département ?';qEl.className='qcm-q-num text';qEl.textContent=dept.name;}
+
   const wrong=ALL_DEPTS.filter(d=>d.num!==dept.num).sort(()=>Math.random()-.5).slice(0,3);
   const opts=[dept,...wrong].sort(()=>Math.random()-.5);
   document.getElementById('qcm-options').innerHTML=opts.map(d=>{
     let label;
     if(mode==='num2name') label=d.name;
     else if(mode==='pref2num'||mode==='name2num') label=`<strong>${d.num}</strong>`;
+    else if(mode==='num2pref' || mode==='name2pref') label=d.pref;
     else label=d.pref;
     return `<button class="qcm-opt" data-num="${d.num}" onclick="answerQcm('${d.num}',this)">${label}</button>`;
   }).join('');
